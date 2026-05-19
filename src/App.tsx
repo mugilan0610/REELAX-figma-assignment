@@ -48,11 +48,11 @@ export default function App() {
   // User Profile & Authentication State
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [userProfile, setUserProfile] = useState({
-    name: 'Abhigyan Pandey',
-    email: 'abhigyan.pandey@getreelax.com',
-    avatar: DEFAULT_AVATAR
-  });
+    const [userProfile, setUserProfile] = useState({
+      name: '',
+      email: '',
+      avatar: DEFAULT_AVATAR
+    });
 
   // Settings Temp Form State
   const [tempProfileName, setTempProfileName] = useState('');
