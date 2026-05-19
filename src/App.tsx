@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowLeft, CheckCircle, AlertCircle, Calendar, Receipt, Sparkles, Check, Download, ClipboardList, Briefcase, IndianRupee } from 'lucide-react';
+import { ArrowLeft, CheckCircle, AlertCircle, Calendar, Receipt, Sparkles, Check, Download, ClipboardList, Briefcase, IndianRupee, User, ShieldAlert, KeyRound } from 'lucide-react';
 import Header from './components/layout/Header';
 import BillingForm from './components/checkout/BillingForm';
 import OrderSummary from './components/checkout/OrderSummary';
@@ -26,12 +26,34 @@ interface Invoice {
   method: string;
 }
 
+const AVATAR_OPTIONS = [
+  { id: '1', url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256&h=256', label: 'Avatar 1 (Default)' },
+  { id: '2', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=256&h=256', label: 'Avatar 2 (Male)' },
+  { id: '3', url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=256&h=256', label: 'Avatar 3 (Female)' },
+  { id: '4', url: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=256&h=256', label: 'Avatar 4 (Professional)' }
+];
+
 export default function App() {
   // Navigation View State
   const [activeView, setActiveView] = useState<'checkout' | 'plans'>('checkout');
 
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
+
+  // User Profile & Authentication State
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [userProfile, setUserProfile] = useState({
+    name: 'Abhigyan Pandey',
+    email: 'abhigyan.pandey@getreelax.com',
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256&h=256'
+  });
+
+  // Settings Temp Form State
+  const [tempProfileName, setTempProfileName] = useState('');
+  const [tempProfileEmail, setTempProfileEmail] = useState('');
+  const [tempProfileAvatar, setTempProfileAvatar] = useState('');
+  const [settingsErrors, setSettingsErrors] = useState<Record<string, string>>({});
 
   // Shared Billing States
   const [billingDetails, setBillingDetails] = useState<BillingDetails>({
@@ -129,6 +151,12 @@ export default function App() {
 
   // Submit/Proceed to Payment Handler
   const handleProceedToPayment = () => {
+    if (!isLoggedIn) {
+      setPaymentToast('You must be logged in to proceed to payment.');
+      setTimeout(() => setPaymentToast(null), 4000);
+      return;
+    }
+
     if (!isBillingSaved) {
       const errorsList: Record<string, string> = {};
       if (!billingDetails.companyName.trim()) errorsList.companyName = 'Company name is required';
@@ -153,7 +181,6 @@ export default function App() {
       setIsProcessingPayment(false);
       setIsPaymentSuccess(true);
       
-      // Add successful transaction to invoice list
       const newInvoice: Invoice = {
         id: `INV-2026-00${billingHistory.length + 1}`,
         date: new Date().toISOString().split('T')[0],
@@ -170,8 +197,8 @@ export default function App() {
     setIsPaymentSuccess(false);
     setIsBillingSaved(false);
     setBillingDetails({
-      companyName: 'abhigyan',
-      email: 'abhigyan.pandey@getreelax.com',
+      companyName: userProfile.name.split(' ')[0].toLowerCase() || 'company',
+      email: userProfile.email,
       gstNumber: '',
       panNumber: '',
       premiseHouse: '',
@@ -206,7 +233,6 @@ export default function App() {
     setIsCreateCampaignOpen(false);
     setCampaignToast(`Campaign "${campaignName}" created successfully!`);
     
-    // Reset Form
     setCampaignName('');
     setCampaignBudget('');
     setCampaignNiche('');
@@ -225,6 +251,59 @@ export default function App() {
     setActiveView('checkout');
   };
 
+  // Login click
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+    setCampaignToast(`Logged in successfully! Welcome back, ${userProfile.name}.`);
+    setTimeout(() => setCampaignToast(null), 3000);
+  };
+
+  // Logout click
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setCampaignToast('Logged out successfully.');
+    setTimeout(() => setCampaignToast(null), 3000);
+  };
+
+  // Open settings
+  const handleOpenSettings = () => {
+    setTempProfileName(userProfile.name);
+    setTempProfileEmail(userProfile.email);
+    setTempProfileAvatar(userProfile.avatar);
+    setSettingsErrors({});
+    setIsSettingsOpen(true);
+  };
+
+  // Save settings
+  const handleSaveSettings = (e: React.FormEvent) => {
+    e.preventDefault();
+    const errors: Record<string, string> = {};
+    if (!tempProfileName.trim()) errors.name = 'Name cannot be empty';
+    if (!tempProfileEmail.trim() || !/\S+@\S+\.\S+/.test(tempProfileEmail)) errors.email = 'Enter a valid email address';
+
+    if (Object.keys(errors).length > 0) {
+      setSettingsErrors(errors);
+      return;
+    }
+
+    setUserProfile({
+      name: tempProfileName,
+      email: tempProfileEmail,
+      avatar: tempProfileAvatar
+    });
+
+    // Also update billing details email if it wasn't customized
+    setBillingDetails(prev => ({
+      ...prev,
+      email: prev.email === userProfile.email ? tempProfileEmail : prev.email,
+      companyName: prev.companyName === userProfile.name.split(' ')[0].toLowerCase() ? tempProfileName.split(' ')[0].toLowerCase() : prev.companyName
+    }));
+
+    setIsSettingsOpen(false);
+    setCampaignToast('Account Settings updated successfully!');
+    setTimeout(() => setCampaignToast(null), 3000);
+  };
+
   return (
     <div className="min-h-screen bg-[#f9f9f9] text-slate-800 antialiased font-sans relative pb-16 selection:bg-[#0d99ff]/20">
       {/* Header bar */}
@@ -234,6 +313,11 @@ export default function App() {
         onUpgradeClick={() => setActiveView('plans')}
         onCreateCampaignClick={() => setIsCreateCampaignOpen(true)}
         onViewHistoryClick={() => setIsHistoryOpen(true)}
+        userProfile={userProfile}
+        isLoggedIn={isLoggedIn}
+        onLoginClick={handleLogin}
+        onLogoutClick={handleLogout}
+        onSettingsClick={handleOpenSettings}
       />
       
       {/* Warning/Alert Toast */}
@@ -244,10 +328,10 @@ export default function App() {
         </div>
       )}
 
-      {/* Campaign Toast Notifications */}
+      {/* Toast Notifications */}
       {campaignToast && (
-        <div className="fixed bottom-4 right-4 z-50 bg-emerald-600 text-white text-xs font-bold px-6 py-3.5 rounded-figma-xl shadow-xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <Check className="w-4 h-4 text-white stroke-[3]" />
+        <div className="fixed bottom-4 right-4 z-50 bg-slate-900 text-white text-xs font-bold px-6 py-3.5 rounded-figma-xl shadow-xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <Check className="w-4 h-4 text-emerald-400 stroke-[3]" />
           {campaignToast}
         </div>
       )}
@@ -341,6 +425,96 @@ export default function App() {
                 Go to Dashboard
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Account Settings Dialog Modal */}
+      {isSettingsOpen && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative animate-in scale-in duration-200">
+            <div className="flex justify-between items-center pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <User className="w-5 h-5 text-[#0d99ff]" />
+                <h3 className="text-lg font-bold text-slate-900">Account Settings</h3>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setIsSettingsOpen(false)}
+                className="text-slate-400 hover:text-slate-600 font-bold text-sm bg-slate-50 p-2 rounded-full border border-slate-100 hover:bg-slate-100 transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveSettings} className="mt-4 space-y-4">
+              {/* Profile Name */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Full Name</label>
+                  {settingsErrors.name && <span className="text-[10px] text-red-500 font-bold">{settingsErrors.name}</span>}
+                </div>
+                <input 
+                  type="text" 
+                  value={tempProfileName}
+                  onChange={(e) => setTempProfileName(e.target.value)}
+                  className={`form-input ${settingsErrors.name ? 'form-input-error' : ''}`}
+                  placeholder="e.g. Abhigyan Pandey"
+                />
+              </div>
+
+              {/* Profile Email */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center">
+                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Email Address</label>
+                  {settingsErrors.email && <span className="text-[10px] text-red-500 font-bold">{settingsErrors.email}</span>}
+                </div>
+                <input 
+                  type="email" 
+                  value={tempProfileEmail}
+                  onChange={(e) => setTempProfileEmail(e.target.value)}
+                  className={`form-input ${settingsErrors.email ? 'form-input-error' : ''}`}
+                  placeholder="e.g. abhigyan.pandey@getreelax.com"
+                />
+              </div>
+
+              {/* Avatar Picker */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">Choose Avatar Profile</label>
+                <div className="grid grid-cols-4 gap-3">
+                  {AVATAR_OPTIONS.map((avatar) => (
+                    <div 
+                      key={avatar.id}
+                      onClick={() => setTempProfileAvatar(avatar.url)}
+                      className={`relative rounded-xl overflow-hidden cursor-pointer border-2 transition-all aspect-square ${tempProfileAvatar === avatar.url ? 'border-[#0d99ff] scale-105 shadow-md' : 'border-slate-100 hover:border-slate-300'}`}
+                    >
+                      <img src={avatar.url} alt={avatar.label} className="w-full h-full object-cover" />
+                      {tempProfileAvatar === avatar.url && (
+                        <div className="absolute inset-0 bg-[#0d99ff]/20 flex items-center justify-center">
+                          <Check className="w-5 h-5 text-white stroke-[3]" />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-4 flex gap-3">
+                <button 
+                  type="button"
+                  onClick={() => setIsSettingsOpen(false)}
+                  className="flex-1 py-3 border border-slate-200 rounded-figma-lg text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="flex-1 py-3 bg-[#0d99ff] text-white rounded-figma-lg text-xs font-bold shadow-md hover:bg-[#0088ee] transition-colors"
+                >
+                  Save Settings
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
@@ -497,12 +671,35 @@ export default function App() {
       )}
 
       {/* Main Content Area */}
-      <main className="max-w-[1280px] mx-auto px-grid-margin py-stack-lg">
+      <main className="max-w-[1280px] mx-auto px-grid-margin py-stack-lg relative">
         
+        {/* Glassmorphic Locked Overlay when Logged Out */}
+        {!isLoggedIn && (
+          <div className="absolute inset-0 bg-[#f9f9f9]/70 backdrop-blur-md z-40 flex items-start justify-center pt-24 animate-in fade-in duration-300">
+            <div className="bg-white border border-[#e2e8f0] max-w-md w-full p-8 rounded-2xl shadow-xl text-center flex flex-col items-center">
+              <div className="w-14 h-14 bg-rose-50 border border-rose-100 rounded-full flex items-center justify-center text-rose-500 mb-4">
+                <ShieldAlert className="w-7 h-7" />
+              </div>
+              <h3 className="text-lg font-bold text-slate-900">Authentication Required</h3>
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                You are currently logged out. To view order summaries, manage campaign collaborations, and check out plans, please sign back in.
+              </p>
+              <button 
+                type="button"
+                onClick={handleLogin}
+                className="w-full mt-6 bg-[#0d99ff] text-white py-3.5 rounded-figma-xl font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:bg-[#0088ee] active:scale-95 transition-all duration-200"
+              >
+                <KeyRound className="w-4 h-4" />
+                Sign In to Resume Session
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Render Views dynamically */}
         {activeView === 'plans' ? (
           // PLANS SELECTION VIEW
-          <div className="max-w-4xl mx-auto py-8 animate-in fade-in slide-in-from-bottom-6 duration-500">
+          <div className={`max-w-4xl mx-auto py-8 animate-in fade-in slide-in-from-bottom-6 duration-500 ${!isLoggedIn ? 'blur-[1px] select-none pointer-events-none' : ''}`}>
             <button 
               onClick={() => setActiveView('checkout')}
               className="flex items-center gap-2 text-slate-500 hover:text-[#0d99ff] transition-colors mb-6 font-bold text-sm cursor-pointer"
@@ -582,7 +779,7 @@ export default function App() {
           </div>
         ) : (
           // CHECKOUT VIEW
-          <div>
+          <div className={!isLoggedIn ? 'blur-[1px] select-none pointer-events-none' : ''}>
             {/* Back navigation */}
             <button 
               onClick={() => setActiveView('plans')}
