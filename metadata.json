@@ -1,0 +1,6 @@
+{
+  "name": "Reelax SaaS Checkout",
+  "description": "A pixel-perfect, responsive SaaS checkout and billing dashboard built with React and Tailwind CSS.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

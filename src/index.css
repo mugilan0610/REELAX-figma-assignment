@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* Brand Colors */
+  --color-primary: #0061a5;
+  --color-primary-container: #0d99ff;
+  --color-on-primary-container: #002f55;
+  
+  --color-secondary: #3f6087;
+  --color-secondary-container: #b0d1fe;
+  
+  --color-tertiary: #934b00;
+  --color-tertiary-container: #e57800;
+  --color-on-tertiary: #ffffff;
+  
+  --color-surface: #f9f9f9;
+  --color-surface-bg: #FFFFFF;
+  --color-surface-container: #eeeeee;
+  --color-surface-container-low: #f3f3f3;
+  --color-surface-container-lowest: #ffffff;
+  
+  --color-outline: #707884;
+  --color-outline-variant: #bfc7d5;
+  --color-stroke-subtle: #E2E8F0;
+  --color-text-muted: #64748B;
+  
+  --color-error: #ba1a1a;
+
+  /* Spacing */
+  --spacing-stack-xs: 4px;
+  --spacing-stack-sm: 8px;
+  --spacing-stack-md: 16px;
+  --spacing-stack-lg: 32px;
+  --spacing-grid-margin: 24px;
+  --spacing-grid-gutter: 16px;
+
+  /* Border Radius */
+  --radius-figma-sm: 0.125rem;
+  --radius-figma-md: 0.375rem;
+  --radius-figma-lg: 0.5rem;
+  --radius-figma-xl: 0.75rem;
+}
+
+@layer base {
+  body {
+    @apply bg-surface text-[#1b1b1b] font-sans antialiased;
+  }
+}
+
+@layer components {
+  .form-input {
+    @apply w-full border border-[#e2e8f0] bg-[#f8fafc] rounded-figma-lg p-3 text-sm font-medium text-slate-800 placeholder:text-slate-400/80 transition-all focus:outline-none focus:bg-white focus:border-primary-container focus:ring-2 focus:ring-primary-container/10;
+  }
+  
+  .form-input-error {
+    @apply border-red-400 focus:border-red-500 focus:ring-red-500/10;
+  }
+  
+  .card-shadow {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+}
