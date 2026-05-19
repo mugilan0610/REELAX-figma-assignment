@@ -325,7 +325,7 @@ export default function App() {
     doc.setFont('helvetica', 'normal');
     doc.text(`${inv.plan}`, 25, 133);
     doc.text('Quarterly (3 months)', 95, 133);
-    doc.text(`${inv.amount}`, 150, 133);
+    doc.text(`${inv.amount.replace(/₹/g, 'INR ')}`, 150, 133);
 
     doc.line(20, 142, 190, 142);
 
@@ -343,7 +343,7 @@ export default function App() {
     doc.text('Total Amount Due Today:', 115, 155);
     doc.setTextColor(primaryColorRed, primaryColorGreen, primaryColorBlue);
     doc.setFontSize(14);
-    doc.text(`${inv.amount}`, 115, 163);
+    doc.text(`${inv.amount.replace(/₹/g, 'INR ')}`, 115, 163);
 
     // Footer banner
     doc.setFillColor(248, 250, 252);
