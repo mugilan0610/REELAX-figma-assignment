@@ -184,7 +184,7 @@ export default function BillingForm({
           </div>
           <input
             className={`form-input ${errors.companyName ? 'form-input-error' : ''}`}
-            placeholder="Company Name"
+            placeholder="abhigyan"
             type="text"
             name="companyName"
             value={billingDetails.companyName}
@@ -205,7 +205,7 @@ export default function BillingForm({
           </div>
           <input
             className={`form-input ${errors.email ? 'form-input-error' : ''}`}
-            placeholder="email@example.com"
+            placeholder="abhigyan.pandey@getreelax.com"
             type="email"
             name="email"
             value={billingDetails.email}

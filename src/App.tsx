@@ -62,8 +62,8 @@ export default function App() {
 
   // Shared Billing States
   const [billingDetails, setBillingDetails] = useState<BillingDetails>({
-    companyName: 'abhigyan',
-    email: 'abhigyan.pandey@getreelax.com',
+    companyName: '',
+    email: '',
     gstNumber: '',
     panNumber: '',
     premiseHouse: '',
@@ -202,8 +202,8 @@ export default function App() {
     setIsPaymentSuccess(false);
     setIsBillingSaved(false);
     setBillingDetails({
-      companyName: userProfile.name.split(' ')[0].toLowerCase() || 'company',
-      email: userProfile.email,
+      companyName: '',
+      email: '',
       gstNumber: '',
       panNumber: '',
       premiseHouse: '',

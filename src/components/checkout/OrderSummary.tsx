@@ -43,7 +43,7 @@ export default function OrderSummary({
   onProceedToPayment,
   isFigmaMode
 }: OrderSummaryProps) {
-  
+
   const handlePlanToggle = () => {
     onInteraction();
     if (selectedPlan === 'startup') {
@@ -67,13 +67,17 @@ export default function OrderSummary({
   };
 
   return (
-    <div className="space-y-4">
-      {/* Summary Card */}
+    <div className="space-y-5">
+      {/* Subscription Plan details block */}
       <div className="bg-white border border-[#e2e8f0] rounded-figma-xl p-4 card-shadow">
-        <h3 className="text-xl font-bold text-slate-900 mb-4">Order Summary</h3>
-        
-        {/* Selected Plan Details */}
-        <div className="bg-white border border-[#0d99ff]/15 rounded-figma-xl p-4 mb-4 shadow-sm bg-gradient-to-tr from-white to-[#0d99ff]/5">
+        <div className="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Order Summary</h1>
+          <span className="text-[10px] text-[#0d99ff] bg-[#0d99ff]/10 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+            Selected
+          </span>
+        </div>
+
+        <div className="bg-white border border-[#0d99ff]/15 rounded-figma-xl p-4 shadow-sm bg-gradient-to-tr from-white to-[#0d99ff]/5">
           <div className="flex justify-between items-start mb-2">
             <div>
               <span className="text-2xl font-bold text-slate-900">
@@ -85,17 +89,17 @@ export default function OrderSummary({
               </p>
             </div>
             <div className="text-right">
-              <span className="text-[10px] text-[#0d99ff] uppercase font-bold tracking-wider block">Selected Plan</span>
+              <span className="text-[10px] text-[#0d99ff] uppercase font-bold tracking-wider block">Billing Tier</span>
               <p className="text-xl font-bold text-slate-900 capitalize">
                 {selectedPlan}
               </p>
             </div>
           </div>
-          
-          <button 
+
+          <button
             type="button"
             onClick={handlePlanToggle}
-            className="w-full mt-4 flex items-center justify-center gap-2 border border-[#0d99ff]/25 text-[#0d99ff] font-semibold text-xs py-2.5 rounded-figma-xl hover:bg-[#0d99ff]/5 active:scale-[0.99] transition-all duration-200"
+            className="w-full mt-4 flex items-center justify-center gap-2 border border-[#0d99ff]/25 text-[#0d99ff] font-semibold text-xs py-2.5 rounded-figma-xl hover:bg-[#0d99ff]/5 active:scale-[0.99] transition-all duration-200 cursor-pointer"
           >
             {selectedPlan === 'startup' ? (
               <>
@@ -110,6 +114,11 @@ export default function OrderSummary({
             )}
           </button>
         </div>
+      </div>
+
+      {/* Payment Calculations Summary card */}
+      <div className="bg-white border border-[#e2e8f0] rounded-figma-xl p-4 card-shadow">
+
 
         <div className="space-y-4">
           {/* Wallet Balance */}
@@ -121,17 +130,17 @@ export default function OrderSummary({
                 <p className="text-[10px] text-slate-400 font-medium">₹500.00 available</p>
               </div>
             </div>
-            <button 
+            <button
               type="button"
               onClick={handleWalletToggle}
-              className={`font-semibold text-xs px-4 py-1.5 border rounded-figma-lg active:scale-95 transition-all duration-200 ${walletApplied ? 'bg-[#0d99ff] border-[#0d99ff] text-white' : 'bg-white border-[#0d99ff]/25 text-[#0d99ff] hover:bg-[#0d99ff]/5'}`}
+              className={`font-semibold text-xs px-4 py-1.5 border rounded-figma-lg active:scale-95 transition-all duration-200 cursor-pointer ${walletApplied ? 'bg-[#0d99ff] border-[#0d99ff] text-white' : 'bg-white border-[#0d99ff]/25 text-[#0d99ff] hover:bg-[#0d99ff]/5'}`}
             >
               {walletApplied ? 'Applied' : 'Apply'}
             </button>
           </div>
 
           {/* Coupon Code Section */}
-          <CouponSection 
+          <CouponSection
             appliedCoupon={appliedCoupon}
             setAppliedCoupon={setAppliedCoupon}
             customCouponText={customCouponText}
@@ -149,7 +158,7 @@ export default function OrderSummary({
               <span className="text-slate-800 font-semibold">{formatCurrency(subtotal)}</span>
             </div>
 
-            {/* Discounts (Only shown if we are in dynamic mode and discounts are applied) */}
+            {/* Discounts */}
             {!isFigmaMode && couponDiscount > 0 && (
               <div className="flex justify-between text-sm font-medium text-emerald-600">
                 <span>Coupon Discount ({appliedCoupon})</span>
@@ -169,13 +178,10 @@ export default function OrderSummary({
               <span>Tax (18% GST)</span>
               <span className="text-slate-800 font-semibold">{formatCurrency(tax)}</span>
             </div>
-            
+
             {/* Total */}
-            <div className="flex justify-between items-end pt-4 mb-4">
+            <div className="flex justify-between items-end pt-4 mb-4 border-t border-slate-100">
               <p className="text-sm font-bold text-slate-800">Total due today</p>
-              {/* Note: The total in the Figma design does not show the ₹ sign on the total. 
-                  But to keep it clean and match the image, we can just output it as a bold blue number. 
-                  Let's check the image: it has "16,078.64" in blue. Let's output it as a plain number formatted with comma, in blue. */}
               <p className="text-3xl font-extrabold text-[#0d99ff] tracking-tight">
                 {total.toLocaleString('en-IN', {
                   minimumFractionDigits: 2,
@@ -184,10 +190,10 @@ export default function OrderSummary({
               </p>
             </div>
 
-            <button 
+            <button
               type="button"
               onClick={onProceedToPayment}
-              className="w-full bg-[#0d99ff] text-white py-4 rounded-figma-xl font-bold text-base shadow-md hover:bg-[#0d99ff]/90 active:scale-[0.98] transition-all duration-200"
+              className="w-full bg-[#0d99ff] text-white py-4 rounded-figma-xl font-bold text-base shadow-md hover:bg-[#0088ee] active:scale-[0.98] transition-all duration-200 cursor-pointer"
             >
               Proceed to Payment
             </button>
