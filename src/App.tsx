@@ -231,7 +231,6 @@ export default function App() {
       <Header 
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        onLogoClick={() => setActiveView('checkout')}
         onUpgradeClick={() => setActiveView('plans')}
         onCreateCampaignClick={() => setIsCreateCampaignOpen(true)}
         onViewHistoryClick={() => setIsHistoryOpen(true)}
