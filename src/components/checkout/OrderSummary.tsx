@@ -194,13 +194,6 @@ export default function OrderSummary({
           </div>
         </div>
       </div>
-
-      {/* Payment Badges */}
-      <div className="flex items-center justify-center gap-6 py-4 opacity-50 grayscale hover:opacity-75 transition-opacity duration-200">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-3" />
-        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-5" />
-        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="h-4.5" />
-      </div>
     </div>
   );
 }
