@@ -1,12 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronDown, CheckCircle, AlertCircle } from 'lucide-react';
-
-const STATE_CITIES: Record<string, string[]> = {
-  "Uttar Pradesh": ["Noida", "Ghaziabad", "Lucknow", "Kanpur"],
-  "Delhi": ["New Delhi", "Dwarka", "Rohini", "Connaught Place"],
-  "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Thane"],
-  "Karnataka": ["Bangalore", "Mysore", "Hubli", "Mangalore"]
-};
+import { INDIA_STATES_AND_CITIES } from '../../data/indiaStatesCities';
 
 interface BillingFormProps {
   billingDetails: {
@@ -41,8 +35,9 @@ export default function BillingForm({
 
   // Sync cities when state changes
   useEffect(() => {
-    if (billingDetails.state && STATE_CITIES[billingDetails.state]) {
-      setCityOptions(STATE_CITIES[billingDetails.state]);
+    if (billingDetails.state) {
+      const match = INDIA_STATES_AND_CITIES.find(item => item.state === billingDetails.state);
+      setCityOptions(match ? match.cities : []);
     } else {
       setCityOptions([]);
     }
@@ -325,8 +320,8 @@ export default function BillingForm({
               onChange={handleChange}
             >
               <option value="">Select state</option>
-              {Object.keys(STATE_CITIES).map((s) => (
-                <option key={s} value={s}>{s}</option>
+              {INDIA_STATES_AND_CITIES.map((item) => (
+                <option key={item.state} value={item.state}>{item.state}</option>
               ))}
             </select>
             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />

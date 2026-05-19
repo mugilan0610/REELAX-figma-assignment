@@ -11,6 +11,7 @@ const MOCK_INFLUENCERS = [
 interface HeaderProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  onLogoClick: () => void;
   onUpgradeClick: () => void;
   onCreateCampaignClick: () => void;
   onViewHistoryClick: () => void;
@@ -19,6 +20,7 @@ interface HeaderProps {
 export default function Header({
   searchQuery,
   setSearchQuery,
+  onLogoClick,
   onUpgradeClick,
   onCreateCampaignClick,
   onViewHistoryClick
@@ -66,6 +68,16 @@ export default function Header({
           {toastMessage}
         </div>
       )}
+
+      {/* Brand Logo & Name */}
+      <div className="flex items-center gap-2 mr-6 shrink-0 cursor-pointer" onClick={onLogoClick}>
+        <div className="w-8 h-8 rounded-figma-lg bg-[#0d99ff] flex items-center justify-center text-white font-black text-lg shadow-sm">
+          R
+        </div>
+        <span className="font-extrabold text-slate-800 text-lg tracking-tight select-none">
+          reelax
+        </span>
+      </div>
 
       {/* Left side search input with dynamic results popup */}
       <div className="flex-1 max-w-md mr-4 relative" ref={searchRef}>
