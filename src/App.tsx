@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
-import { ArrowLeft, CheckCircle, AlertCircle, Calendar, Receipt, Sparkles, Check, Download, ClipboardList, Briefcase, IndianRupee, User, ShieldAlert, KeyRound } from 'lucide-react';
+import { ArrowLeft, CheckCircle, AlertCircle, Calendar, Receipt, Sparkles, Check, Download, ClipboardList, Briefcase, IndianRupee, User, ShieldAlert, KeyRound, Upload } from 'lucide-react';
+import { jsPDF } from 'jspdf';
 import Header from './components/layout/Header';
 import BillingForm from './components/checkout/BillingForm';
 import OrderSummary from './components/checkout/OrderSummary';
@@ -26,8 +27,12 @@ interface Invoice {
   method: string;
 }
 
+// URL-encoded clean SVG data URL for a default person profile icon
+const DEFAULT_AVATAR = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="%2364748b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="32" height="32" rx="16" fill="%23f1f5f9"/><circle cx="16" cy="12" r="4"/><path d="M6 26a10 10 0 0 1 20 0"/></svg>`;
+
 const AVATAR_OPTIONS = [
-  { id: '1', url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256&h=256', label: 'Avatar 1 (Default)' },
+  { id: 'default', url: DEFAULT_AVATAR, label: 'Default Icon' },
+  { id: '1', url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256&h=256', label: 'Avatar 1 (Female)' },
   { id: '2', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=256&h=256', label: 'Avatar 2 (Male)' },
   { id: '3', url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=256&h=256', label: 'Avatar 3 (Female)' },
   { id: '4', url: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&q=80&w=256&h=256', label: 'Avatar 4 (Professional)' }
@@ -46,7 +51,7 @@ export default function App() {
   const [userProfile, setUserProfile] = useState({
     name: 'Abhigyan Pandey',
     email: 'abhigyan.pandey@getreelax.com',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256&h=256'
+    avatar: DEFAULT_AVATAR
   });
 
   // Settings Temp Form State
@@ -240,9 +245,122 @@ export default function App() {
     setTimeout(() => setCampaignToast(null), 3000);
   };
 
+  // Client-side authentic PDF Generator and Downloader
   const handleDownloadInvoice = (id: string) => {
-    setCampaignToast(`Downloading invoice ${id} as PDF...`);
-    setTimeout(() => setCampaignToast(null), 2500);
+    const inv = billingHistory.find(item => item.id === id);
+    if (!inv) return;
+
+    setCampaignToast(`Generating invoice ${id} PDF...`);
+
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    const primaryColorRed = 13;
+    const primaryColorGreen = 153;
+    const primaryColorBlue = 255;
+
+    // Header Banner
+    doc.setFillColor(primaryColorRed, primaryColorGreen, primaryColorBlue);
+    doc.rect(0, 0, 210, 40, 'F');
+
+    // Title text
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(24);
+    doc.text('REELAX', 20, 22);
+
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.text('Influencer Collaboration Platform', 20, 30);
+
+    doc.setFontSize(20);
+    doc.setFont('helvetica', 'bold');
+    doc.text('TAX INVOICE', 140, 25);
+
+    // Metadata Left Column
+    doc.setTextColor(15, 23, 42); // Slate 900
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Invoice Details', 20, 55);
+
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Invoice Number: ${inv.id}`, 20, 63);
+    doc.text(`Issue Date: ${inv.date}`, 20, 70);
+    doc.text(`Payment Status: ${inv.status}`, 20, 77);
+    doc.text(`Mode of Payment: ${inv.method}`, 20, 84);
+
+    // Bill To Right Column
+    doc.setFont('helvetica', 'bold');
+    doc.text('Bill To (Subscriber)', 120, 55);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${billingDetails.companyName || 'Valued Subscriber'}`, 120, 63);
+    doc.text(`${billingDetails.email || userProfile.email}`, 120, 70);
+    doc.text(`${billingDetails.premiseHouse || ''} ${billingDetails.street || ''}`, 120, 77);
+    doc.text(`${billingDetails.city || ''}, ${billingDetails.state || ''} - ${billingDetails.pinCode || ''}`, 120, 84);
+    if (billingDetails.gstNumber) {
+      doc.text(`GSTIN: ${billingDetails.gstNumber}`, 120, 91);
+    }
+    if (billingDetails.panNumber) {
+      doc.text(`PAN: ${billingDetails.panNumber}`, 120, 98);
+    }
+
+    // Line separator
+    doc.setDrawColor(226, 232, 240);
+    doc.setLineWidth(0.5);
+    doc.line(20, 105, 190, 105);
+
+    // Table Header
+    doc.setFillColor(248, 250, 252);
+    doc.rect(20, 115, 170, 10, 'F');
+    
+    doc.setFont('helvetica', 'bold');
+    doc.text('Service Item Description', 25, 121);
+    doc.text('Billing Cycle', 95, 121);
+    doc.text('Subtotal Amount', 150, 121);
+
+    // Table Content
+    doc.setFont('helvetica', 'normal');
+    doc.text(`${inv.plan}`, 25, 133);
+    doc.text('Quarterly (3 months)', 95, 133);
+    doc.text(`${inv.amount}`, 150, 133);
+
+    doc.line(20, 142, 190, 142);
+
+    // Summary calculation
+    doc.setFont('helvetica', 'bold');
+    doc.text('Terms and Declarations:', 20, 155);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8.5);
+    doc.text('1. GST Integrated tax rate of 18% is applied.', 20, 162);
+    doc.text('2. Payments are fully settled and cleared.', 20, 168);
+    doc.text('3. This is a secure digitally generated document.', 20, 174);
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Total Amount Due Today:', 115, 155);
+    doc.setTextColor(primaryColorRed, primaryColorGreen, primaryColorBlue);
+    doc.setFontSize(14);
+    doc.text(`${inv.amount}`, 115, 163);
+
+    // Footer banner
+    doc.setFillColor(248, 250, 252);
+    doc.rect(0, 270, 210, 27, 'F');
+    
+    doc.setTextColor(100, 116, 139); // Slate 500
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Thank you for collaborating with Reelax. Need support? Write us at support@getreelax.com', 105, 282, { align: 'center' });
+
+    // Download PDF
+    doc.save(`${inv.id}.pdf`);
+
+    setTimeout(() => {
+      setCampaignToast(`Downloaded ${inv.id} Invoice PDF successfully.`);
+    }, 1000);
+    setTimeout(() => setCampaignToast(null), 3500);
   };
 
   const handleSelectPlanFromList = (plan: 'startup' | 'growth') => {
@@ -478,15 +596,43 @@ export default function App() {
                 />
               </div>
 
-              {/* Avatar Picker */}
+              {/* Upload Custom Avatar Image */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                  <Upload className="w-3.5 h-3.5 text-[#0d99ff]" />
+                  Upload Custom Avatar
+                </label>
+                <div className="flex items-center gap-3">
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          if (event.target?.result) {
+                            setTempProfileAvatar(event.target.result as string);
+                          }
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-3 file:rounded-figma-lg file:border-0 file:text-[11px] file:font-bold file:bg-[#0d99ff]/10 file:text-[#0d99ff] hover:file:bg-[#0d99ff]/20 cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              {/* Preset Avatar Picker */}
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">Choose Avatar Profile</label>
-                <div className="grid grid-cols-4 gap-3">
+                <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block">Or select Preset Avatar</label>
+                <div className="grid grid-cols-5 gap-3">
                   {AVATAR_OPTIONS.map((avatar) => (
                     <div 
                       key={avatar.id}
                       onClick={() => setTempProfileAvatar(avatar.url)}
-                      className={`relative rounded-xl overflow-hidden cursor-pointer border-2 transition-all aspect-square ${tempProfileAvatar === avatar.url ? 'border-[#0d99ff] scale-105 shadow-md' : 'border-slate-100 hover:border-slate-300'}`}
+                      className={`relative rounded-xl overflow-hidden cursor-pointer border-2 transition-all aspect-square flex items-center justify-center bg-slate-50 ${tempProfileAvatar === avatar.url ? 'border-[#0d99ff] scale-105 shadow-md' : 'border-slate-100 hover:border-slate-300'}`}
+                      title={avatar.label}
                     >
                       <img src={avatar.url} alt={avatar.label} className="w-full h-full object-cover" />
                       {tempProfileAvatar === avatar.url && (
@@ -564,7 +710,7 @@ export default function App() {
                       <td className="p-3 text-center">
                         <button 
                           onClick={() => handleDownloadInvoice(inv.id)}
-                          className="text-[#0d99ff] hover:text-[#0088ee] hover:bg-[#0d99ff]/5 p-1.5 rounded-lg border border-[#0d99ff]/10 bg-white transition-all flex items-center gap-1 mx-auto"
+                          className="text-[#0d99ff] hover:text-[#0088ee] hover:bg-[#0d99ff]/5 p-1.5 rounded-lg border border-[#0d99ff]/10 bg-white transition-all flex items-center gap-1 mx-auto cursor-pointer"
                         >
                           <Download className="w-3.5 h-3.5" />
                           PDF

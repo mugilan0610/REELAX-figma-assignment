@@ -73,7 +73,7 @@ export default function BillingForm({
     if (!billingDetails.companyName.trim()) {
       newErrors.companyName = 'Company name is required';
     }
-    
+
     if (!billingDetails.email.trim()) {
       newErrors.email = 'Email address is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(billingDetails.email)) {
@@ -134,8 +134,8 @@ export default function BillingForm({
   const handleCancel = () => {
     // Reset to defaults
     setBillingDetails({
-      companyName: 'abhigyan',
-      email: 'abhigyan.pandey@getreelax.com',
+      companyName: '',
+      email: '',
       gstNumber: '',
       panNumber: '',
       premiseHouse: '',
@@ -182,10 +182,10 @@ export default function BillingForm({
               </span>
             )}
           </div>
-          <input 
+          <input
             className={`form-input ${errors.companyName ? 'form-input-error' : ''}`}
-            placeholder="Company Name" 
-            type="text" 
+            placeholder="Company Name"
+            type="text"
             name="companyName"
             value={billingDetails.companyName}
             onChange={handleChange}
@@ -203,10 +203,10 @@ export default function BillingForm({
               </span>
             )}
           </div>
-          <input 
+          <input
             className={`form-input ${errors.email ? 'form-input-error' : ''}`}
-            placeholder="email@example.com" 
-            type="email" 
+            placeholder="email@example.com"
+            type="email"
             name="email"
             value={billingDetails.email}
             onChange={handleChange}
@@ -226,10 +226,10 @@ export default function BillingForm({
               </span>
             )}
           </div>
-          <input 
+          <input
             className={`form-input ${errors.gstNumber ? 'form-input-error' : ''}`}
-            placeholder="GST Number" 
-            type="text" 
+            placeholder="GST Number"
+            type="text"
             name="gstNumber"
             value={billingDetails.gstNumber}
             onChange={handleChange}
@@ -249,10 +249,10 @@ export default function BillingForm({
               </span>
             )}
           </div>
-          <input 
+          <input
             className={`form-input ${errors.panNumber ? 'form-input-error' : ''}`}
-            placeholder="PAN Number" 
-            type="text" 
+            placeholder="PAN Number"
+            type="text"
             name="panNumber"
             value={billingDetails.panNumber}
             onChange={handleChange}
@@ -270,10 +270,10 @@ export default function BillingForm({
               </span>
             )}
           </div>
-          <input 
+          <input
             className={`form-input ${errors.premiseHouse ? 'form-input-error' : ''}`}
-            placeholder="Premise/House no." 
-            type="text" 
+            placeholder="Premise/House no."
+            type="text"
             name="premiseHouse"
             value={billingDetails.premiseHouse}
             onChange={handleChange}
@@ -291,10 +291,10 @@ export default function BillingForm({
               </span>
             )}
           </div>
-          <input 
+          <input
             className={`form-input ${errors.street ? 'form-input-error' : ''}`}
-            placeholder="Street" 
-            type="text" 
+            placeholder="Street"
+            type="text"
             name="street"
             value={billingDetails.street}
             onChange={handleChange}
@@ -313,7 +313,7 @@ export default function BillingForm({
             )}
           </div>
           <div className="relative">
-            <select 
+            <select
               className={`form-input appearance-none bg-[#f8fafc] cursor-pointer ${errors.state ? 'form-input-error' : ''}`}
               name="state"
               value={billingDetails.state}
@@ -340,7 +340,7 @@ export default function BillingForm({
             )}
           </div>
           <div className="relative">
-            <select 
+            <select
               className={`form-input appearance-none bg-[#f8fafc] cursor-pointer ${errors.city ? 'form-input-error' : ''}`}
               name="city"
               value={billingDetails.city}
@@ -359,11 +359,11 @@ export default function BillingForm({
         {/* Country */}
         <div className="space-y-2">
           <label className="text-xs font-bold text-slate-700 uppercase tracking-wider">Country</label>
-          <input 
-            className="form-input bg-slate-100/80 cursor-not-allowed opacity-80 text-slate-500" 
-            value="India" 
-            readOnly 
-            type="text" 
+          <input
+            className="form-input bg-slate-100/80 cursor-not-allowed opacity-80 text-slate-500"
+            value="India"
+            readOnly
+            type="text"
           />
         </div>
 
@@ -378,10 +378,10 @@ export default function BillingForm({
               </span>
             )}
           </div>
-          <input 
+          <input
             className={`form-input ${errors.pinCode ? 'form-input-error' : ''}`}
-            placeholder="Pincode" 
-            type="text" 
+            placeholder="Pincode"
+            type="text"
             name="pinCode"
             maxLength={6}
             value={billingDetails.pinCode}
@@ -391,15 +391,15 @@ export default function BillingForm({
 
         {/* Buttons */}
         <div className="md:col-span-2 flex justify-end gap-4 mt-8">
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={handleCancel}
             className="px-8 py-3 border border-slate-200 rounded-figma-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all duration-200"
           >
             Cancel
           </button>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="px-8 py-3 bg-primary-container text-white rounded-figma-lg text-sm font-bold shadow-md hover:bg-primary-container/90 active:scale-[0.98] transition-all duration-200"
           >
             Save Details
